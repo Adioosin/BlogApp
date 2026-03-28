@@ -1,12 +1,6 @@
 # BlogApp Copilot Instructions
 
-This repository is a greenfield blogging platform MVP being built as a monorepo.
-
-## Product Scope
-
-- Build an MVP blogging platform with registration, login, multi-author posts, drafts, publishing, comments, rich text editing, and image upload.
-- Keep the first release focused. Do not add moderation, search, tags, likes, profiles, notifications, or other non-MVP features unless explicitly requested.
-- Prioritize auth and core content workflows before editor polish or deployment hardening.
+This repository is a blogging platform MVP being built as a monorepo. See `PLAN.md` for product scope, delivery phases, and verification criteria. Do not add features beyond the current phase unless explicitly requested.
 
 ## Expected Repository Shape
 
@@ -23,44 +17,72 @@ This repository is a greenfield blogging platform MVP being built as a monorepo.
 
 If proposing an alternative, explain the tradeoff and keep it compatible with the monorepo plan.
 
-## Architecture Decisions
+## Pinned Libraries
 
-- Drafts are stored in the `Post` table using an `isPublished` flag. Do not introduce a separate `Draft` model unless explicitly asked.
-- Unpublished drafts must only be visible to their author.
-- Editing and deletion must enforce ownership checks.
+- Package manager: pnpm with workspace support.
+- Validation: Zod for request validation on both backend and frontend.
+- Password hashing: bcrypt.
+- Rich text editor: TipTap.
+- Testing: Vitest for unit and integration tests, Supertest for API endpoint testing.
+- Linting and formatting: ESLint with Prettier (single config at root).
+
+Do not introduce alternatives without discussing the tradeoff first.
+
+## Architecture Constraints
+
+- Use an `isPublished` flag on the `Post` table for drafts. No separate `Draft` model.
+- Unpublished drafts are only visible to their author.
+- Enforce ownership checks on edit and delete operations.
 - Comments are only allowed on published posts.
-- Comment deletion should be limited to the comment author unless moderation support is explicitly introduced.
-- Rich text output must be sanitized before rendering.
-- For image uploads, prefer Cloudinary for fastest MVP delivery or S3 with presigned URLs if tighter storage control is requested.
+- Comment deletion is limited to the comment author.
+- Sanitize rich text output before rendering.
+- Prefer Cloudinary for image uploads unless S3 is explicitly requested.
 
-## Delivery Order
+## API Conventions
 
-When planning or implementing work, follow this order unless the user says otherwise:
+- All backend routes are prefixed with `/api/v1`.
+- Success responses follow the shape: `{ data: T }`.
+- Error responses follow the shape: `{ error: { message: string, code?: string } }`.
+- Use standard HTTP status codes: 200 OK, 201 Created, 204 No Content, 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 409 Conflict, 422 Unprocessable Entity, 500 Internal Server Error.
+- Paginated list endpoints accept `page` and `limit` query params and return `{ data: T[], meta: { page, limit, total } }`.
 
-1. Project foundation and workspace setup.
-2. Backend core, Prisma schema, and database integration.
-3. Authentication and authorization.
-4. Post authoring, drafts, publishing, and feed APIs.
-5. Commenting and basic anti-spam protections.
-6. Frontend shell, routing, auth state, and protected pages.
-7. Editor integration, draft UX, sanitization, and image upload.
-8. Tests, verification, and deployment hardening.
+## Area-Specific Guidance
 
-## Backend Guidance
+Detailed backend and frontend guidance lives in scoped instruction files that load automatically when editing files in those areas:
 
-- Organize backend code with clear separation between routes, middleware, and business logic.
-- Add request validation for external inputs.
-- Add centralized error handling instead of duplicating response logic.
-- Enforce auth and authorization in protected routes.
-- Add pagination and sorting for public post listing endpoints.
-- Prefer explicit DTOs and predictable JSON responses over ad hoc response shapes.
+- Backend: `.github/instructions/backend.instructions.md` (applies to `apps/backend/**`)
+- Frontend: `.github/instructions/frontend.instructions.md` (applies to `apps/frontend/**`)
 
-## Frontend Guidance
+## Code Style
 
-- Organize the app around routes for home/feed, post details, login/register, dashboard or my posts, and post editor.
-- Include API client utilities and shared auth-state handling rather than scattering fetch logic across components.
-- Protect authenticated routes and handle expired sessions cleanly.
-- Keep UI implementation aligned with the existing architecture plan rather than introducing extra state-management libraries without a clear need.
+- Use `kebab-case` for file and folder names (e.g., `auth-middleware.ts`, `post-service.ts`).
+- Use named exports, not default exports.
+- Use `camelCase` for variables and functions, `PascalCase` for types, interfaces, and React components.
+- Prefer `type` over `interface` unless declaration merging is needed.
+- Import order: Node built-ins, external packages, internal aliases, relative imports — separated by blank lines.
+
+## Git Conventions
+
+- Branch naming: `feature/<short-description>`, `fix/<short-description>`, `chore/<short-description>`.
+- Commit messages: imperative mood, lowercase, no period. Example: `add jwt refresh token rotation`.
+- Keep commits focused on a single logical change.
+- Never push directly to the `main` branch. All changes must go through a pull request.
+- After finishing work on a branch, create a pull request targeting `main` for review before merging.
+
+## Environment Variables
+
+The `.env.example` file must document every required variable. Current expected variables:
+
+- `DATABASE_URL` — PostgreSQL connection string.
+- `JWT_ACCESS_SECRET` — Secret for signing access tokens.
+- `JWT_REFRESH_SECRET` — Secret for signing refresh tokens.
+- `JWT_ACCESS_EXPIRES_IN` — Access token TTL (e.g., `15m`).
+- `JWT_REFRESH_EXPIRES_IN` — Refresh token TTL (e.g., `7d`).
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` — Image upload credentials (when Cloudinary is chosen).
+- `PORT` — Backend server port (default `3000`).
+- `FRONTEND_URL` — Frontend origin for CORS configuration.
+
+Update `.env.example` whenever a new variable is introduced.
 
 ## Shared Types And Contracts
 
@@ -88,3 +110,4 @@ When planning or implementing work, follow this order unless the user says other
 - Use the MVP plan as the source of truth for scope and sequencing.
 - Ask before expanding scope beyond the planned feature set.
 - If the codebase is still being scaffolded, create the minimal structure needed for the current phase instead of speculative abstractions.
+- When in doubt about a library or pattern choice, check the Pinned Libraries section above before picking an alternative.
