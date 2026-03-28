@@ -16,7 +16,7 @@ Follow these steps **in order**. Do not skip steps. Use the todo tool to track p
 
 1. Read `PLAN.md` to understand the project phases and current state.
 2. Read `.github/copilot-instructions.md` for project conventions.
-3. Read the repo memory at `/memories/repo/lessons-learned.md` for past mistakes to avoid.
+3. Read `memories/lessons-learned.md` for past mistakes to avoid.
 4. Based on which areas you'll touch, read the relevant instruction files:
    - Backend work → `.github/instructions/backend.instructions.md`
    - Frontend work → `.github/instructions/frontend.instructions.md`
