@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
+import bcrypt from 'bcrypt';
 
 import { PrismaClient } from '../src/generated/prisma/client.js';
 
@@ -11,14 +12,18 @@ if (!connectionString) {
 const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
+const SEED_PASSWORD = 'password123';
+
 async function seed() {
+  const hashedPassword = await bcrypt.hash(SEED_PASSWORD, 10);
+
   const alice = await prisma.user.upsert({
     where: { email: 'alice@blogapp.com' },
     update: {},
     create: {
       email: 'alice@blogapp.com',
       name: 'Alice Johnson',
-      password: '$2b$10$placeholder-hashed-password-alice',
+      password: hashedPassword,
     },
   });
 
@@ -28,7 +33,7 @@ async function seed() {
     create: {
       email: 'bob@blogapp.com',
       name: 'Bob Williams',
-      password: '$2b$10$placeholder-hashed-password-bob',
+      password: hashedPassword,
     },
   });
 

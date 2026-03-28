@@ -7,6 +7,6 @@ describe('frontend smoke tests', () => {
   it('renders the App component without crashing', () => {
     render(<App />);
 
-    expect(screen.getByText(/blogapp/i)).toBeDefined();
+    expect(screen.getByRole('heading', { name: /blogapp/i })).toBeDefined();
   });
 });
