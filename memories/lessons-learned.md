@@ -16,6 +16,11 @@
 ## PR Reviews
 - Always read the actual file content before flagging missing items in reviews — avoid false positives
 
+## GitHub PR Review Workflow (Phase 3)
+- **GitHub PR Self-Approval Constraint**: Cannot use `APPROVE` event when reviewing your own PRs via GitHub API. GitHub returns "Can not approve your own pull request" error.
+- **Solution**: Always use `COMMENT` event instead of `APPROVE` when the PR author and reviewer are the same user
+- **Context**: This affects `/raise-pr` workflow and any automated PR review process - must detect ownership and adjust review event accordingly
+
 ## Prisma + Test Isolation (Phase 3)
 - `lib/prisma.ts` uses eager init — importing any route that touches prisma will throw without `DATABASE_URL`. Use lazy init (Proxy pattern) so tests that import `app.ts` don't need a real DB connection.
 - When adding new routes that import prisma, run existing tests FIRST before writing new ones to catch import-time breakage early.
