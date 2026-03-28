@@ -17,3 +17,41 @@ export type PaginatedResponse<T> = {
     total: number;
   };
 };
+
+// Auth types
+
+export type UserDto = {
+  id: string;
+  email: string;
+  name: string;
+};
+
+export type AuthTokens = {
+  accessToken: string;
+  refreshToken: string;
+};
+
+export type AuthResponse = {
+  user: UserDto;
+  tokens: AuthTokens;
+};
+
+export type RegisterRequest = {
+  email: string;
+  name: string;
+  password: string;
+};
+
+export type LoginRequest = {
+  email: string;
+  password: string;
+};
+
+export type RefreshRequest = {
+  refreshToken: string;
+};
+
+export type TokenPayload = {
+  userId: string;
+  email: string;
+};
