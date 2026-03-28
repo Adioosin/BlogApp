@@ -6,28 +6,21 @@ import jwt from 'jsonwebtoken';
 import type { AuthResponse, AuthTokens, LoginRequest, RegisterRequest, TokenPayload } from '@blogapp/types';
 
 import { prisma } from '../lib/prisma.js';
+import { env } from '../lib/env.js';
 import type { AppError } from '../middleware/error-handler.js';
 
 const SALT_ROUNDS = 10;
-
-function getEnvOrThrow(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`${name} environment variable is required`);
-  }
-  return value;
-}
 
 function hashToken(token: string): string {
   return createHash('sha256').update(token).digest('hex');
 }
 
 function generateTokens(payload: TokenPayload): AuthTokens {
-  const accessToken = jwt.sign(payload, getEnvOrThrow('JWT_ACCESS_SECRET'), {
+  const accessToken = jwt.sign(payload, env('JWT_ACCESS_SECRET'), {
     expiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '15m',
   });
 
-  const refreshToken = jwt.sign(payload, getEnvOrThrow('JWT_REFRESH_SECRET'), {
+  const refreshToken = jwt.sign(payload, env('JWT_REFRESH_SECRET'), {
     expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
   });
 
@@ -102,7 +95,7 @@ async function loginUser(data: LoginRequest): Promise<AuthResponse> {
 async function refreshTokens(refreshToken: string): Promise<AuthTokens> {
   let payload: TokenPayload;
   try {
-    payload = jwt.verify(refreshToken, getEnvOrThrow('JWT_REFRESH_SECRET')) as TokenPayload;
+    payload = jwt.verify(refreshToken, env('JWT_REFRESH_SECRET')) as TokenPayload;
   } catch {
     const error = new Error('Invalid refresh token') as AppError;
     error.statusCode = 401;
