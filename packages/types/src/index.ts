@@ -55,3 +55,26 @@ export type TokenPayload = {
   userId: string;
   email: string;
 };
+
+// Post types
+
+export type PostDto = {
+  id: string;
+  title: string;
+  content: string;
+  isPublished: boolean;
+  authorId: string;
+  createdAt: string;
+  updatedAt: string;
+  author: UserDto;
+};
+
+export type CreatePostRequest = {
+  title: string;
+  content: string;
+};
+
+export type UpdatePostRequest = {
+  title?: string;
+  content?: string;
+};
