@@ -49,7 +49,6 @@ Do not introduce alternatives without discussing the tradeoff first.
 ## Area-Specific Guidance
 
 Detailed backend and frontend guidance lives in scoped instruction files that load automatically when editing files in those areas:
-
 - Backend: `.github/instructions/backend.instructions.md` (applies to `apps/backend/**`)
 - Frontend: `.github/instructions/frontend.instructions.md` (applies to `apps/frontend/**`)
 
@@ -66,8 +65,6 @@ Detailed backend and frontend guidance lives in scoped instruction files that lo
 - Branch naming: `feature/<short-description>`, `fix/<short-description>`, `chore/<short-description>`.
 - Commit messages: imperative mood, lowercase, no period. Example: `add jwt refresh token rotation`.
 - Keep commits focused on a single logical change.
-- Never push directly to the `main` branch. All changes must go through a pull request.
-- After finishing work on a branch, create a pull request targeting `main` for review before merging.
 
 ## Environment Variables
 
@@ -92,10 +89,21 @@ Update `.env.example` whenever a new variable is introduced.
 
 ## Testing Expectations
 
-- Add or update tests for behavior that changes.
+- Add or update tests for every new feature, bug fix, or behavioral change.
+- Always run the full test suite before pushing changes. If any test fails, investigate the root cause and fix the implementation or the test as needed — do not push with failing tests.
 - Backend priority tests: auth flows, permissions, drafts, publishing, posts, and comments.
 - Frontend priority tests: login, protected-route behavior, post creation and editing, publishing, and comment submission.
 - When implementing security-sensitive features, include verification for authorization and data visibility.
+
+## Infrastructure
+
+- When spinning up services like databases, caches, or message brokers, use Docker (e.g., `docker compose`) instead of installing them directly on the host machine.
+- Include or update a `docker-compose.yml` at the repo root for any infrastructure dependencies.
+
+## Schema Changes
+
+- Before creating a new Prisma schema or modifying an existing one (adding/removing models, fields, relations, or indexes), present the proposed changes to the user and wait for explicit confirmation before applying them.
+- This applies to any migration-generating change, not just the initial schema.
 
 ## Working Style
 
