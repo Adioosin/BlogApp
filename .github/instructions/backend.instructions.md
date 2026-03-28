@@ -29,7 +29,9 @@ applyTo: 'apps/backend/**'
 
 ## Database
 
+- Use Docker (`docker compose`) to run PostgreSQL locally. Do not require a host-level installation.
 - Use Prisma for all database access. Do not write raw SQL unless Prisma cannot express the query.
+- Before creating or modifying the Prisma schema (models, fields, relations, indexes), present the proposed changes to the user and get explicit confirmation before applying.
 - Keep migrations reversible when possible.
 - Seed data should be idempotent.
 
