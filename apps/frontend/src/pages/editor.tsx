@@ -6,6 +6,7 @@ import { AxiosError } from 'axios';
 import type { ApiError } from '@blogapp/types';
 
 import { postsApi } from '../lib/api-client.js';
+import { RichTextEditor } from '../components/rich-text-editor.js';
 
 const postSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -19,9 +20,11 @@ export function EditorPage() {
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [isPublished, setIsPublished] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
   const [isLoading, setIsLoading] = useState(isEditing);
 
   useEffect(() => {
@@ -32,13 +35,13 @@ export function EditorPage() {
       .then((res) => {
         setTitle(res.data.data.title);
         setContent(res.data.data.content);
+        setIsPublished(res.data.data.isPublished);
       })
       .catch(() => setServerError('Failed to load post'))
       .finally(() => setIsLoading(false));
   }, [id]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const save = async (andPublish: boolean) => {
     setErrors({});
     setServerError('');
 
@@ -53,13 +56,25 @@ export function EditorPage() {
       return;
     }
 
-    setIsSubmitting(true);
+    if (andPublish) {
+      setIsPublishing(true);
+    } else {
+      setIsSubmitting(true);
+    }
+
     try {
+      let postId = id;
       if (isEditing) {
         await postsApi.update(id, result.data);
       } else {
-        await postsApi.create(result.data);
+        const res = await postsApi.create(result.data);
+        postId = res.data.data.id;
       }
+
+      if (andPublish && postId) {
+        await postsApi.publish(postId);
+      }
+
       navigate('/dashboard');
     } catch (err) {
       if (err instanceof AxiosError && err.response?.data) {
@@ -70,7 +85,17 @@ export function EditorPage() {
       }
     } finally {
       setIsSubmitting(false);
+      setIsPublishing(false);
     }
+  };
+
+  const handleSaveDraft = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await save(false);
+  };
+
+  const handlePublish = async () => {
+    await save(true);
   };
 
   if (isLoading) {
@@ -86,7 +111,7 @@ export function EditorPage() {
     <div className="max-w-3xl mx-auto">
       <h1 className="text-3xl font-bold text-text-primary mb-8">{isEditing ? 'Edit Post' : 'New Post'}</h1>
       <div className="bg-surface rounded-xl border border-border shadow-card p-6 sm:p-8">
-        <form onSubmit={handleSubmit} noValidate className="space-y-6">
+        <form onSubmit={handleSaveDraft} noValidate className="space-y-6">
           {serverError && (
             <div className="bg-red-50 border border-red-200 text-danger rounded-lg px-4 py-3 text-sm" role="alert">
               {serverError}
@@ -108,32 +133,40 @@ export function EditorPage() {
             {errors.title && <span className="block text-sm text-danger mt-1">{errors.title}</span>}
           </div>
           <div>
-            <label htmlFor="content" className="block text-sm font-medium text-text-primary mb-1.5">
+            <label className="block text-sm font-medium text-text-primary mb-1.5">
               Content
             </label>
-            <textarea
-              id="content"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={15}
-              aria-invalid={!!errors.content}
-              className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow aria-[invalid=true]:border-danger aria-[invalid=true]:ring-danger/20 resize-y leading-relaxed"
-              placeholder="Write your post content here..."
-            />
+            <RichTextEditor content={content} onChange={setContent} onError={setServerError} />
             {errors.content && <span className="block text-sm text-danger mt-1">{errors.content}</span>}
           </div>
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-3">
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="px-6 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              disabled={isSubmitting || isPublishing}
+              className="px-6 py-2.5 text-sm font-medium rounded-lg border border-border text-text-secondary bg-surface hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {isSubmitting
-                ? 'Saving...'
-                : isEditing
-                  ? 'Update Post'
-                  : 'Create Draft'}
+              {isSubmitting ? 'Saving...' : 'Save Draft'}
             </button>
+            {!isPublished && (
+              <button
+                type="button"
+                onClick={handlePublish}
+                disabled={isSubmitting || isPublishing}
+                className="px-6 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {isPublishing ? 'Publishing...' : 'Publish'}
+              </button>
+            )}
+            {isPublished && (
+              <button
+                type="button"
+                onClick={() => save(false).then(() => navigate('/dashboard'))}
+                disabled={isSubmitting || isPublishing}
+                className="px-6 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {isSubmitting ? 'Updating...' : 'Update Post'}
+              </button>
+            )}
           </div>
         </form>
       </div>

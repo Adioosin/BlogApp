@@ -1,4 +1,5 @@
 import DOMPurify from 'dompurify';
+import { marked } from 'marked';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -6,7 +7,8 @@ import type { PostDto } from '@blogapp/types';
 
 import { postsApi } from '../lib/api-client.js';
 
-function stripHtml(html: string): string {
+function stripToPlainText(md: string): string {
+  const html = marked.parse(md, { async: false }) as string;
   const clean = DOMPurify.sanitize(html, { ALLOWED_TAGS: [] });
   return clean;
 }
@@ -76,7 +78,7 @@ export function HomePage() {
             </p>
             <p className="text-text-secondary leading-relaxed">
               {(() => {
-                const text = stripHtml(post.content);
+                const text = stripToPlainText(post.content);
                 return text.length > 200
                   ? `${text.slice(0, 200)}...`
                   : text;
