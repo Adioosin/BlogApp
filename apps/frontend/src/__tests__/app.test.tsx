@@ -1,12 +1,29 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+
+vi.mock('../lib/api-client.js', () => ({
+  authApi: {
+    me: () => Promise.reject(new Error('Not authenticated')),
+  },
+  postsApi: {
+    list: () =>
+      Promise.resolve({
+        data: { data: [], meta: { page: 1, limit: 10, total: 0 } },
+      }),
+  },
+  setTokens: vi.fn(),
+  getAccessToken: () => null,
+  getRefreshToken: () => null,
+}));
 
 import { App } from '../app.js';
 
 describe('frontend smoke tests', () => {
-  it('renders the App component without crashing', () => {
+  it('renders the App component without crashing', async () => {
     render(<App />);
 
-    expect(screen.getByRole('heading', { name: /blogapp/i })).toBeDefined();
+    await waitFor(() => {
+      expect(screen.getByText('BlogApp')).toBeDefined();
+    });
   });
 });
