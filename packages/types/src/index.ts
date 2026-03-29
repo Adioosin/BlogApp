@@ -78,3 +78,19 @@ export type UpdatePostRequest = {
   title?: string;
   content?: string;
 };
+
+// Comment types
+
+export type CommentDto = {
+  id: string;
+  body: string;
+  postId: string;
+  authorId: string;
+  createdAt: string;
+  updatedAt: string;
+  author: UserDto;
+};
+
+export type CreateCommentRequest = {
+  body: string;
+};
