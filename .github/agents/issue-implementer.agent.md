@@ -1,7 +1,7 @@
 ---
 description: "Use when asked to implement a phase, work on an issue, build a feature from a GitHub issue, or execute a plan. Takes a GitHub issue number, plans the work, implements it, verifies done-when criteria, adds tests, and delivers a PR-ready branch."
 tools: [read, edit, search, execute, todo, agent, "io.github.github/github-mcp-server/*"]
-model: ['Claude Sonnet 4', 'Claude Opus 4.6']
+model: ['Claude Opus 4.6']
 argument-hint: "GitHub issue number (e.g., '#4' or '4')"
 agents: [Explore, pr-reviewer]
 ---
