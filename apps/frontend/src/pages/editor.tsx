@@ -73,43 +73,70 @@ export function EditorPage() {
     }
   };
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
+        <span className="ml-3 text-text-secondary">Loading...</span>
+      </div>
+    );
+  }
 
   return (
-    <div className="editor-page">
-      <h1>{isEditing ? 'Edit Post' : 'New Post'}</h1>
-      <form onSubmit={handleSubmit} noValidate>
-        {serverError && <p className="error-message" role="alert">{serverError}</p>}
-        <div className="form-field">
-          <label htmlFor="title">Title</label>
-          <input
-            id="title"
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            aria-invalid={!!errors.title}
-          />
-          {errors.title && <span className="field-error">{errors.title}</span>}
-        </div>
-        <div className="form-field">
-          <label htmlFor="content">Content</label>
-          <textarea
-            id="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows={15}
-            aria-invalid={!!errors.content}
-          />
-          {errors.content && <span className="field-error">{errors.content}</span>}
-        </div>
-        <button type="submit" disabled={isSubmitting}>
-          {isSubmitting
-            ? 'Saving...'
-            : isEditing
-              ? 'Update Post'
-              : 'Create Draft'}
-        </button>
-      </form>
+    <div className="max-w-3xl mx-auto">
+      <h1 className="text-3xl font-bold text-text-primary mb-8">{isEditing ? 'Edit Post' : 'New Post'}</h1>
+      <div className="bg-surface rounded-xl border border-border shadow-card p-6 sm:p-8">
+        <form onSubmit={handleSubmit} noValidate className="space-y-6">
+          {serverError && (
+            <div className="bg-red-50 border border-red-200 text-danger rounded-lg px-4 py-3 text-sm" role="alert">
+              {serverError}
+            </div>
+          )}
+          <div>
+            <label htmlFor="title" className="block text-sm font-medium text-text-primary mb-1.5">
+              Title
+            </label>
+            <input
+              id="title"
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              aria-invalid={!!errors.title}
+              className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow aria-[invalid=true]:border-danger aria-[invalid=true]:ring-danger/20 text-lg"
+              placeholder="Give your post a title..."
+            />
+            {errors.title && <span className="block text-sm text-danger mt-1">{errors.title}</span>}
+          </div>
+          <div>
+            <label htmlFor="content" className="block text-sm font-medium text-text-primary mb-1.5">
+              Content
+            </label>
+            <textarea
+              id="content"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows={15}
+              aria-invalid={!!errors.content}
+              className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow aria-[invalid=true]:border-danger aria-[invalid=true]:ring-danger/20 resize-y leading-relaxed"
+              placeholder="Write your post content here..."
+            />
+            {errors.content && <span className="block text-sm text-danger mt-1">{errors.content}</span>}
+          </div>
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-6 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {isSubmitting
+                ? 'Saving...'
+                : isEditing
+                  ? 'Update Post'
+                  : 'Create Draft'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

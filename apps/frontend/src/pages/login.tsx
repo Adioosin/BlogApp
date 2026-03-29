@@ -54,39 +54,62 @@ export function LoginPage() {
   };
 
   return (
-    <div className="auth-page">
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit} noValidate>
-        {serverError && <p className="error-message" role="alert">{serverError}</p>}
-        <div className="form-field">
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            aria-invalid={!!errors.email}
-          />
-          {errors.email && <span className="field-error">{errors.email}</span>}
+    <div className="flex justify-center py-8">
+      <div className="w-full max-w-md">
+        <div className="bg-surface rounded-xl border border-border shadow-card p-8">
+          <h1 className="text-2xl font-bold text-text-primary text-center mb-6">Login</h1>
+          <form onSubmit={handleSubmit} noValidate className="space-y-5">
+            {serverError && (
+              <div className="bg-red-50 border border-red-200 text-danger rounded-lg px-4 py-3 text-sm" role="alert">
+                {serverError}
+              </div>
+            )}
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-text-primary mb-1.5">
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                aria-invalid={!!errors.email}
+                className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow aria-[invalid=true]:border-danger aria-[invalid=true]:ring-danger/20"
+                placeholder="you@example.com"
+              />
+              {errors.email && <span className="block text-sm text-danger mt-1">{errors.email}</span>}
+            </div>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-text-primary mb-1.5">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                aria-invalid={!!errors.password}
+                className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow aria-[invalid=true]:border-danger aria-[invalid=true]:ring-danger/20"
+                placeholder="••••••••"
+              />
+              {errors.password && <span className="block text-sm text-danger mt-1">{errors.password}</span>}
+            </div>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full px-4 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {isSubmitting ? 'Logging in...' : 'Login'}
+            </button>
+          </form>
+          <p className="text-center text-sm text-text-secondary mt-6">
+            Don&apos;t have an account?{' '}
+            <Link to="/register" className="font-medium text-primary-600 hover:text-primary-700">
+              Register
+            </Link>
+          </p>
         </div>
-        <div className="form-field">
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            aria-invalid={!!errors.password}
-          />
-          {errors.password && <span className="field-error">{errors.password}</span>}
-        </div>
-        <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
-      <p>
-        Don&apos;t have an account? <Link to="/register">Register</Link>
-      </p>
+      </div>
     </div>
   );
 }
