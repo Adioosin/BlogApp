@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const UPLOADS_DIR = path.resolve('uploads');
+const ALLOWED_MIMETYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
 function ensureUploadDir(): void {
   if (!fs.existsSync(UPLOADS_DIR)) {
@@ -22,6 +23,10 @@ type UploadResult = {
 };
 
 function saveImage(file: Express.Multer.File): UploadResult {
+  if (!ALLOWED_MIMETYPES.includes(file.mimetype)) {
+    throw new Error('Invalid file type');
+  }
+
   ensureUploadDir();
 
   const filename = generateFilename(file.originalname);

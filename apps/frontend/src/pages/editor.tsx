@@ -136,7 +136,7 @@ export function EditorPage() {
             <label className="block text-sm font-medium text-text-primary mb-1.5">
               Content
             </label>
-            <RichTextEditor content={content} onChange={setContent} />
+            <RichTextEditor content={content} onChange={setContent} onError={setServerError} />
             {errors.content && <span className="block text-sm text-danger mt-1">{errors.content}</span>}
           </div>
           <div className="flex justify-end gap-3">

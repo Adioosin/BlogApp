@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
@@ -7,13 +7,18 @@ import { Markdown } from 'tiptap-markdown';
 
 import { uploadApi } from '../lib/api-client.js';
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
 type RichTextEditorProps = {
   content: string;
   onChange: (markdown: string) => void;
+  onError?: (message: string) => void;
   placeholder?: string;
 };
 
-export function RichTextEditor({ content, onChange, placeholder = 'Write your post content...' }: RichTextEditorProps) {
+export function RichTextEditor({ content, onChange, onError, placeholder = 'Write your post content...' }: RichTextEditorProps) {
+  const [isUploading, setIsUploading] = useState(false);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -48,18 +53,25 @@ export function RichTextEditor({ content, onChange, placeholder = 'Write your po
       const file = input.files?.[0];
       if (!file) return;
 
+      if (file.size > MAX_FILE_SIZE) {
+        onError?.('File size exceeds 5 MB limit');
+        return;
+      }
+
+      setIsUploading(true);
       try {
         const res = await uploadApi.image(file);
         const url = res.data.data.url;
         editor.chain().focus().setImage({ src: url }).run();
       } catch {
-        // Could not upload — show alert as fallback
-        alert('Failed to upload image. Please try again.');
+        onError?.('Failed to upload image. Please try again.');
+      } finally {
+        setIsUploading(false);
       }
     };
 
     input.click();
-  }, [editor]);
+  }, [editor, onError]);
 
   const setLink = useCallback(() => {
     if (!editor) return;
@@ -160,8 +172,9 @@ export function RichTextEditor({ content, onChange, placeholder = 'Write your po
           onClick={addImage}
           isActive={false}
           title="Upload image"
+          disabled={isUploading}
         >
-          🖼️
+          {isUploading ? '⏳' : '🖼️'}
         </ToolbarButton>
       </div>
       <EditorContent
@@ -176,11 +189,13 @@ function ToolbarButton({
   onClick,
   isActive,
   title,
+  disabled,
   children,
 }: {
   onClick: () => void;
   isActive: boolean;
   title: string;
+  disabled?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -188,7 +203,8 @@ function ToolbarButton({
       type="button"
       onClick={onClick}
       title={title}
-      className={`px-2 py-1 text-sm rounded transition-colors ${
+      disabled={disabled}
+      className={`px-2 py-1 text-sm rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
         isActive
           ? 'bg-primary-100 text-primary-700'
           : 'text-text-secondary hover:bg-surface-hover'

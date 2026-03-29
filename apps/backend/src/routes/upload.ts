@@ -1,11 +1,17 @@
 import { Router } from 'express';
 import multer from 'multer';
+import { z } from 'zod';
 
 import { authenticate } from '../middleware/auth.js';
 import { saveImage } from '../services/upload-service.js';
 
 const ALLOWED_MIMETYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+const MAX_FILE_SIZE = parseInt(process.env.UPLOAD_MAX_FILE_SIZE ?? '5242880', 10);
+
+const uploadResponseSchema = z.object({
+  url: z.string(),
+  filename: z.string(),
+});
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -21,12 +27,13 @@ const upload = multer({
 
 const uploadRouter = Router();
 
-uploadRouter.post('/upload/image', authenticate, (req, res, next) => {
+uploadRouter.post('/upload/image', authenticate, (req, res) => {
   upload.single('image')(req, res, (err) => {
     if (err instanceof multer.MulterError) {
       if (err.code === 'LIMIT_FILE_SIZE') {
+        const limitMb = Math.round(MAX_FILE_SIZE / (1024 * 1024));
         res.status(422).json({
-          error: { message: 'File size exceeds 5 MB limit', code: 'FILE_TOO_LARGE' },
+          error: { message: `File size exceeds ${limitMb} MB limit`, code: 'FILE_TOO_LARGE' },
         });
         return;
       }
@@ -51,9 +58,12 @@ uploadRouter.post('/upload/image', authenticate, (req, res, next) => {
 
     try {
       const result = saveImage(req.file);
-      res.status(201).json({ data: result });
+      const validated = uploadResponseSchema.parse(result);
+      res.status(201).json({ data: validated });
     } catch {
-      next(new Error('Failed to save uploaded image'));
+      res.status(500).json({
+        error: { message: 'Upload processing failed', code: 'UPLOAD_ERROR' },
+      });
     }
   });
 });
