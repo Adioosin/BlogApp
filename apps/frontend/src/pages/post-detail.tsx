@@ -1,4 +1,5 @@
 import DOMPurify from 'dompurify';
+import { marked } from 'marked';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
@@ -6,6 +7,11 @@ import type { CommentDto, PostDto } from '@blogapp/types';
 
 import { useAuth } from '../hooks/use-auth.js';
 import { commentsApi, postsApi } from '../lib/api-client.js';
+
+function renderMarkdown(md: string): string {
+  const raw = marked.parse(md, { async: false }) as string;
+  return DOMPurify.sanitize(raw);
+}
 
 export function PostDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -94,7 +100,7 @@ export function PostDetailPage() {
         </div>
         <div
           className="prose max-w-none"
-          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
+          dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }}
         />
       </article>
 

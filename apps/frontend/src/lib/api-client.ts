@@ -144,4 +144,15 @@ export const commentsApi = {
     api.delete(`/comments/${encodeURIComponent(id)}`),
 };
 
+// Upload API
+export const uploadApi = {
+  image: (file: File) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    return api.post<ApiResponse<{ url: string; filename: string }>>('/upload/image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+};
+
 export { api };

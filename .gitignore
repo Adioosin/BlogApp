@@ -16,6 +16,9 @@ vite.config.d.ts
 # Coverage
 coverage/
 
+# Uploads
+uploads/
+
 # IDE
 .vscode/
 !.vscode/settings.json
