@@ -17,6 +17,10 @@ import type {
 
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1';
 
+if (import.meta.env.PROD && !import.meta.env.VITE_API_URL) {
+  console.warn('VITE_API_URL is not set — falling back to localhost. This is likely a misconfiguration in production.');
+}
+
 let accessToken: string | null = null;
 let refreshToken: string | null = null;
 

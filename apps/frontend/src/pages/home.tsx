@@ -1,9 +1,15 @@
+import DOMPurify from 'dompurify';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import type { PostDto } from '@blogapp/types';
 
 import { postsApi } from '../lib/api-client.js';
+
+function stripHtml(html: string): string {
+  const clean = DOMPurify.sanitize(html, { ALLOWED_TAGS: [] });
+  return clean;
+}
 
 export function HomePage() {
   const [posts, setPosts] = useState<PostDto[]>([]);
@@ -47,9 +53,12 @@ export function HomePage() {
               {new Date(post.createdAt).toLocaleDateString()}
             </p>
             <p className="post-excerpt">
-              {post.content.length > 200
-                ? `${post.content.slice(0, 200)}...`
-                : post.content}
+              {(() => {
+                const text = stripHtml(post.content);
+                return text.length > 200
+                  ? `${text.slice(0, 200)}...`
+                  : text;
+              })()}
             </p>
           </article>
         ))}

@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
@@ -73,7 +74,10 @@ export function PostDetailPage() {
           {new Date(post.createdAt).toLocaleDateString()}
           {!post.isPublished && <span className="draft-badge"> (Draft)</span>}
         </p>
-        <div className="post-content">{post.content}</div>
+        <div
+          className="post-content"
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
+        />
       </article>
 
       {post.isPublished && (
