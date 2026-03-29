@@ -4,6 +4,9 @@ node_modules/
 # Build outputs
 dist/
 .vite/
+*.tsbuildinfo
+*.d.ts.map
+vite.config.d.ts
 
 # Environment variables
 .env
