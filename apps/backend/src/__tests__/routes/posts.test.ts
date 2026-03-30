@@ -16,6 +16,12 @@ vi.mock('../../lib/prisma.js', () => {
         update: vi.fn(),
         delete: vi.fn(),
       },
+      postLike: {
+        groupBy: vi.fn().mockResolvedValue([]),
+        findMany: vi.fn().mockResolvedValue([]),
+        count: vi.fn().mockResolvedValue(0),
+        findUnique: vi.fn().mockResolvedValue(null),
+      },
       user: {
         findUnique: vi.fn(),
       },
@@ -73,6 +79,10 @@ beforeEach(() => {
   vi.clearAllMocks();
   process.env.JWT_ACCESS_SECRET = TEST_ACCESS_SECRET;
   process.env.JWT_REFRESH_SECRET = 'test-refresh-secret';
+  mockedPrisma.postLike.groupBy.mockResolvedValue([]);
+  mockedPrisma.postLike.findMany.mockResolvedValue([]);
+  mockedPrisma.postLike.count.mockResolvedValue(0);
+  mockedPrisma.postLike.findUnique.mockResolvedValue(null);
 });
 
 // ─── GET /api/v1/posts ──────────────────────────────────────────────────

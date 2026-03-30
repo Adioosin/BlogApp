@@ -5,6 +5,7 @@ import { Link, useParams } from 'react-router-dom';
 
 import type { CommentDto, PostDto } from '@blogapp/types';
 
+import { LikeButton } from '../components/like-button.js';
 import { useAuth } from '../hooks/use-auth.js';
 import { commentsApi, postsApi } from '../lib/api-client.js';
 
@@ -88,15 +89,22 @@ export function PostDetailPage() {
     <div className="max-w-3xl mx-auto">
       <article className="bg-surface rounded-xl border border-border shadow-card p-6 sm:p-8 mb-8">
         <h1 className="text-3xl font-bold text-text-primary mb-3">{post.title}</h1>
-        <div className="flex items-center gap-2 text-sm text-text-muted mb-6">
-          <span>By {post.author.name}</span>
-          <span>&middot;</span>
-          <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-          {!post.isPublished && (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-warning border border-amber-200 ml-2">
-              Draft
-            </span>
-          )}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2 text-sm text-text-muted">
+            <span>By {post.author.name}</span>
+            <span>&middot;</span>
+            <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+            {!post.isPublished && (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-warning border border-amber-200 ml-2">
+                Draft
+              </span>
+            )}
+          </div>
+          <LikeButton
+            postId={post.id}
+            initialLikeCount={post.likeCount}
+            initialLikedByMe={post.likedByMe}
+          />
         </div>
         <div
           className="prose max-w-none"

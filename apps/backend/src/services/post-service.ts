@@ -2,6 +2,7 @@ import type { CreatePostRequest, PostDto, UpdatePostRequest, UserDto } from '@bl
 
 import { prisma } from '../lib/prisma.js';
 import type { AppError } from '../middleware/error-handler.js';
+import { getLikeData } from './like-service.js';
 
 const authorSelect = { id: true, email: true, name: true };
 
@@ -14,6 +15,8 @@ function toPostDto(post: {
   createdAt: Date;
   updatedAt: Date;
   author: UserDto;
+  likeCount: number;
+  likedByMe: boolean;
 }): PostDto {
   return {
     id: post.id,
@@ -24,10 +27,18 @@ function toPostDto(post: {
     createdAt: post.createdAt.toISOString(),
     updatedAt: post.updatedAt.toISOString(),
     author: post.author,
+    likeCount: post.likeCount,
+    likedByMe: post.likedByMe,
   };
 }
 
-async function listPublishedPosts(page: number, limit: number, sortBy: string, order: string) {
+async function listPublishedPosts(
+  page: number,
+  limit: number,
+  sortBy: string,
+  order: string,
+  requestingUserId?: string,
+) {
   const skip = (page - 1) * limit;
 
   const orderBy = sortBy === 'title'
@@ -45,8 +56,33 @@ async function listPublishedPosts(page: number, limit: number, sortBy: string, o
     prisma.post.count({ where: { isPublished: true } }),
   ]);
 
+  const postIds = posts.map((p) => p.id);
+
+  const [likeCounts, userLikes] = await Promise.all([
+    prisma.postLike.groupBy({
+      by: ['postId'],
+      where: { postId: { in: postIds } },
+      _count: { postId: true },
+    }),
+    requestingUserId
+      ? prisma.postLike.findMany({
+          where: { userId: requestingUserId, postId: { in: postIds } },
+          select: { postId: true },
+        })
+      : Promise.resolve([]),
+  ]);
+
+  const likeCountMap = new Map(likeCounts.map((r) => [r.postId, r._count.postId]));
+  const likedSet = new Set(userLikes.map((l) => l.postId));
+
   return {
-    data: posts.map(toPostDto),
+    data: posts.map((p) =>
+      toPostDto({
+        ...p,
+        likeCount: likeCountMap.get(p.id) ?? 0,
+        likedByMe: likedSet.has(p.id),
+      }),
+    ),
     meta: { page, limit, total },
   };
 }
@@ -65,8 +101,31 @@ async function listMyPosts(userId: string, page: number, limit: number) {
     prisma.post.count({ where: { authorId: userId } }),
   ]);
 
+  const postIds = posts.map((p) => p.id);
+
+  const [likeCounts, userLikes] = await Promise.all([
+    prisma.postLike.groupBy({
+      by: ['postId'],
+      where: { postId: { in: postIds } },
+      _count: { postId: true },
+    }),
+    prisma.postLike.findMany({
+      where: { userId, postId: { in: postIds } },
+      select: { postId: true },
+    }),
+  ]);
+
+  const likeCountMap = new Map(likeCounts.map((r) => [r.postId, r._count.postId]));
+  const likedSet = new Set(userLikes.map((l) => l.postId));
+
   return {
-    data: posts.map(toPostDto),
+    data: posts.map((p) =>
+      toPostDto({
+        ...p,
+        likeCount: likeCountMap.get(p.id) ?? 0,
+        likedByMe: likedSet.has(p.id),
+      }),
+    ),
     meta: { page, limit, total },
   };
 }
@@ -91,7 +150,8 @@ async function getPost(postId: string, requestingUserId?: string): Promise<PostD
     throw error;
   }
 
-  return toPostDto(post);
+  const { likeCount, likedByMe } = await getLikeData(post.id, requestingUserId);
+  return toPostDto({ ...post, likeCount, likedByMe });
 }
 
 async function createPost(data: CreatePostRequest, authorId: string): Promise<PostDto> {
@@ -104,7 +164,7 @@ async function createPost(data: CreatePostRequest, authorId: string): Promise<Po
     include: { author: { select: authorSelect } },
   });
 
-  return toPostDto(post);
+  return toPostDto({ ...post, likeCount: 0, likedByMe: false });
 }
 
 async function updatePost(postId: string, data: UpdatePostRequest): Promise<PostDto> {
@@ -114,7 +174,7 @@ async function updatePost(postId: string, data: UpdatePostRequest): Promise<Post
     include: { author: { select: authorSelect } },
   });
 
-  return toPostDto(post);
+  return toPostDto({ ...post, likeCount: 0, likedByMe: false });
 }
 
 async function publishPost(postId: string): Promise<PostDto> {
@@ -124,7 +184,7 @@ async function publishPost(postId: string): Promise<PostDto> {
     include: { author: { select: authorSelect } },
   });
 
-  return toPostDto(post);
+  return toPostDto({ ...post, likeCount: 0, likedByMe: false });
 }
 
 async function deletePost(postId: string): Promise<void> {

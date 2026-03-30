@@ -10,6 +10,15 @@ vi.mock('../../lib/api-client.js', () => ({
   postsApi: {
     list: (...args: unknown[]) => mockList(...args),
   },
+  likesApi: {
+    like: vi.fn().mockResolvedValue({}),
+    unlike: vi.fn().mockResolvedValue({}),
+  },
+}));
+
+vi.mock('../../hooks/use-auth.js', () => ({
+  useAuth: () => ({ isAuthenticated: false }),
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 describe('HomePage', () => {
@@ -48,6 +57,8 @@ describe('HomePage', () => {
             createdAt: '2026-03-28T00:00:00Z',
             updatedAt: '2026-03-28T00:00:00Z',
             author: { id: 'u1', email: 'a@b.com', name: 'Author' },
+            likeCount: 0,
+            likedByMe: false,
           },
         ],
         meta: { page: 1, limit: 10, total: 1 },

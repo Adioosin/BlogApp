@@ -144,6 +144,15 @@ export const commentsApi = {
     api.delete(`/comments/${encodeURIComponent(id)}`),
 };
 
+// Likes API
+export const likesApi = {
+  like: (postId: string) =>
+    api.post(`/posts/${encodeURIComponent(postId)}/like`),
+
+  unlike: (postId: string) =>
+    api.delete(`/posts/${encodeURIComponent(postId)}/like`),
+};
+
 // Upload API
 export const uploadApi = {
   image: (file: File) => {

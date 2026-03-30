@@ -67,6 +67,8 @@ export type PostDto = {
   createdAt: string;
   updatedAt: string;
   author: UserDto;
+  likeCount: number;
+  likedByMe: boolean;
 };
 
 export type CreatePostRequest = {

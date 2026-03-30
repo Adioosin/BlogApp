@@ -34,7 +34,7 @@ const myPostsPaginationSchema = z.object({
 
 // Routes
 
-postsRouter.get('/posts', validate(paginationSchema, 'query'), async (req, res, next) => {
+postsRouter.get('/posts', optionalAuth, validate(paginationSchema, 'query'), async (req, res, next) => {
   try {
     const { page, limit, sortBy, order } = req.query as unknown as {
       page: number;
@@ -42,7 +42,7 @@ postsRouter.get('/posts', validate(paginationSchema, 'query'), async (req, res, 
       sortBy: string;
       order: string;
     };
-    const result = await postService.listPublishedPosts(page, limit, sortBy, order);
+    const result = await postService.listPublishedPosts(page, limit, sortBy, order, req.user?.userId);
     res.json(result);
   } catch (err) {
     next(err);

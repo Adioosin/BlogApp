@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 
 import type { PostDto } from '@blogapp/types';
 
+import { LikeButton } from '../components/like-button.js';
 import { postsApi } from '../lib/api-client.js';
 
 function stripToPlainText(md: string): string {
@@ -84,6 +85,19 @@ export function HomePage() {
                   : text;
               })()}
             </p>
+            <div className="mt-4 flex items-center justify-between">
+              <LikeButton
+                postId={post.id}
+                initialLikeCount={post.likeCount}
+                initialLikedByMe={post.likedByMe}
+              />
+              <Link
+                to={`/posts/${post.id}`}
+                className="text-sm text-primary-600 hover:text-primary-700 no-underline font-medium"
+              >
+                Read more →
+              </Link>
+            </div>
           </article>
         ))}
       </div>
