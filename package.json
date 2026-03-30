@@ -8,7 +8,10 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "pnpm --filter @blogapp/backend test && pnpm --filter @blogapp/frontend test"
+    "test": "pnpm --filter @blogapp/backend test && pnpm --filter @blogapp/frontend test",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down",
+    "docker:db": "docker compose up db --build -d"
   },
   "engines": {
     "node": ">=18",

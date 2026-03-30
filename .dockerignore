@@ -1,0 +1,13 @@
+node_modules
+dist
+.env
+.env.local
+*.log
+.git
+.gitignore
+.vscode
+.github
+memories
+packages/mcp-server
+apps/backend/uploads
+apps/backend/src/generated
