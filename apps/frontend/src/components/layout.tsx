@@ -34,7 +34,7 @@ export function Layout() {
   return (
     <div className="min-h-screen flex flex-col bg-surface-alt">
       <header
-        className="sticky top-0 z-50 backdrop-blur-sm border-b"
+        className="sticky top-0 z-50 backdrop-blur border-b"
         style={{
           background: 'var(--color-header-bg)',
           borderColor: 'var(--color-header-border)',

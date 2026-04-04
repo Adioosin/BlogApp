@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 
 vi.mock('../lib/api-client.js', () => ({
@@ -19,11 +19,27 @@ vi.mock('../lib/api-client.js', () => ({
 import { App } from '../app.js';
 
 describe('frontend smoke tests', () => {
+  beforeEach(() => {
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: (query: string) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: () => {},
+        removeListener: () => {},
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        dispatchEvent: () => false,
+      }),
+    });
+  });
+
   it('renders the App component without crashing', async () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByText('BlogApp')).toBeDefined();
+      expect(screen.getAllByText('BlogApp')).toBeDefined();
     });
   });
 });
