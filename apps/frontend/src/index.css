@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@700;800&display=swap");
 
 @theme {
   /* Primary — emerald green */
@@ -62,9 +63,6 @@
   --color-header-bg: rgba(15, 23, 42, 0.85);
   --color-header-border: #334155;
 }
-
-/* Load Inter for headings only */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@700;800&display=swap");
 
 /* Base styles */
 @layer base {
