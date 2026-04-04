@@ -19,22 +19,6 @@ vi.mock('../lib/api-client.js', () => ({
 import { App } from '../app.js';
 
 describe('frontend smoke tests', () => {
-  beforeEach(() => {
-    Object.defineProperty(window, 'matchMedia', {
-      writable: true,
-      value: (query: string) => ({
-        matches: false,
-        media: query,
-        onchange: null,
-        addListener: () => {},
-        removeListener: () => {},
-        addEventListener: () => {},
-        removeEventListener: () => {},
-        dispatchEvent: () => false,
-      }),
-    });
-  });
-
   it('renders the App component without crashing', async () => {
     render(<App />);
 

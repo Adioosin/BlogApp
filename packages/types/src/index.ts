@@ -67,6 +67,8 @@ export type PostDto = {
   createdAt: string;
   updatedAt: string;
   author: UserDto;
+  tags?: string[];
+  coverImage?: string;
 };
 
 export type CreatePostRequest = {

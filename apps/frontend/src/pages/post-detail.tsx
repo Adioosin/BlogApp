@@ -92,7 +92,7 @@ export function PostDetailPage() {
       <article className="mb-12">
         {/* Tag + read time */}
         <div className="flex items-center gap-3 mb-4">
-          {(post as PostDto & { tags?: string[] }).tags?.[0] && (
+          {post.tags?.[0] && (
             <span
               className="text-xs font-medium px-2.5 py-0.5 rounded-full"
               style={{
@@ -101,7 +101,7 @@ export function PostDetailPage() {
                 border: '1px solid var(--color-primary-subtle-border)',
               }}
             >
-              {(post as PostDto & { tags?: string[] }).tags![0]}
+              {post.tags[0]}
             </span>
           )}
           <span className="text-sm text-text-muted">{readTime} min read</span>
@@ -132,9 +132,9 @@ export function PostDetailPage() {
         </div>
 
         {/* Cover image */}
-        {(post as PostDto & { coverImage?: string }).coverImage && (
+        {post.coverImage && (
           <img
-            src={(post as PostDto & { coverImage?: string }).coverImage}
+            src={post.coverImage}
             alt={post.title}
             className="w-full rounded-xl mb-8"
             style={{ maxHeight: '400px', objectFit: 'cover' }}

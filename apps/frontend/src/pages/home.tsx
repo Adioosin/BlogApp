@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 
 import type { PostDto } from '@blogapp/types';
 
-import { useAuth } from '../hooks/use-auth.js';
 import { postsApi } from '../lib/api-client.js';
 import { Avatar } from '../components/avatar.js';
 
@@ -28,7 +27,6 @@ function gradientForName(name: string): string {
 }
 
 export function HomePage() {
-  const { user } = useAuth();
   const [posts, setPosts] = useState<PostDto[]>([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -56,17 +54,13 @@ export function HomePage() {
       {/* Hero bio section */}
       <div className="mb-8 pb-8 border-b border-border">
         <div className="flex items-center gap-4 mb-3">
-          {user ? (
-            <Avatar name={user.name} size="lg" />
-          ) : (
-            <div
-              className="w-12 h-12 rounded-full flex-shrink-0"
-              style={{ background: 'linear-gradient(135deg, #10b981, #3b82f6)' }}
-            />
-          )}
+          <div
+            className="w-12 h-12 rounded-full flex-shrink-0"
+            style={{ background: 'linear-gradient(135deg, #10b981, #3b82f6)' }}
+          />
           <div>
             <div className="text-lg font-bold text-text-primary" style={{ letterSpacing: '-0.02em' }}>
-              {user?.name ?? 'BlogApp'}
+              BlogApp
             </div>
             <div className="text-sm text-text-secondary">
               Writing about software, design, and the web.
@@ -99,8 +93,7 @@ export function HomePage() {
       <div className="flex flex-col gap-1">
         {posts.map((post) => {
           const excerpt = stripToPlainText(post.content);
-          const tag = (post as PostDto & { tags?: string[] }).tags?.[0];
-          const thumbnail = (post as PostDto & { coverImage?: string }).coverImage;
+          const tag = post.tags?.[0];
 
           return (
             <article
@@ -146,7 +139,9 @@ export function HomePage() {
               <div
                 className="w-20 h-20 rounded-lg flex-shrink-0"
                 style={{
-                  background: thumbnail ? `url(${thumbnail}) center/cover` : gradientForName(post.title),
+                  background: post.coverImage
+                    ? `url(${post.coverImage}) center/cover`
+                    : gradientForName(post.tags?.[0] ?? post.title),
                 }}
               />
             </article>
