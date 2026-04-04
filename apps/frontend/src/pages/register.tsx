@@ -62,7 +62,7 @@ export function RegisterPage() {
           <h1 className="text-2xl font-bold text-text-primary text-center mb-6">Register</h1>
           <form onSubmit={handleSubmit} noValidate className="space-y-5">
             {serverError && (
-              <div className="bg-red-50 border border-red-200 text-danger rounded-lg px-4 py-3 text-sm" role="alert">
+              <div className="bg-danger/10 border border-danger/30 text-danger rounded-lg px-4 py-3 text-sm" role="alert">
                 {serverError}
               </div>
             )}
@@ -76,7 +76,7 @@ export function RegisterPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 aria-invalid={!!errors.name}
-                className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow aria-[invalid=true]:border-danger aria-[invalid=true]:ring-danger/20"
+                className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow aria-[invalid=true]:border-danger aria-[invalid=true]:ring-danger/20"
                 placeholder="Your name"
               />
               {errors.name && <span className="block text-sm text-danger mt-1">{errors.name}</span>}
@@ -91,7 +91,7 @@ export function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 aria-invalid={!!errors.email}
-                className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow aria-[invalid=true]:border-danger aria-[invalid=true]:ring-danger/20"
+                className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow aria-[invalid=true]:border-danger aria-[invalid=true]:ring-danger/20"
                 placeholder="you@example.com"
               />
               {errors.email && <span className="block text-sm text-danger mt-1">{errors.email}</span>}
@@ -106,7 +106,7 @@ export function RegisterPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 aria-invalid={!!errors.password}
-                className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow aria-[invalid=true]:border-danger aria-[invalid=true]:ring-danger/20"
+                className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow aria-[invalid=true]:border-danger aria-[invalid=true]:ring-danger/20"
                 placeholder="At least 8 characters"
               />
               {errors.password && <span className="block text-sm text-danger mt-1">{errors.password}</span>}
@@ -114,14 +114,15 @@ export function RegisterPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full px-4 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full px-4 py-2.5 text-sm font-semibold text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:opacity-90"
+              style={{ background: 'var(--color-primary)' }}
             >
               {isSubmitting ? 'Registering...' : 'Register'}
             </button>
           </form>
           <p className="text-center text-sm text-text-secondary mt-6">
             Already have an account?{' '}
-            <Link to="/login" className="font-medium text-primary-600 hover:text-primary-700">
+            <Link to="/login" className="font-medium hover:opacity-80 no-underline" style={{ color: 'var(--color-primary)' }}>
               Login
             </Link>
           </p>

@@ -101,7 +101,7 @@ export function EditorPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
         <span className="ml-3 text-text-secondary">Loading...</span>
       </div>
     );
@@ -113,7 +113,7 @@ export function EditorPage() {
       <div className="bg-surface rounded-xl border border-border shadow-card p-6 sm:p-8">
         <form onSubmit={handleSaveDraft} noValidate className="space-y-6">
           {serverError && (
-            <div className="bg-red-50 border border-red-200 text-danger rounded-lg px-4 py-3 text-sm" role="alert">
+            <div className="bg-danger/10 border border-danger/30 text-danger rounded-lg px-4 py-3 text-sm" role="alert">
               {serverError}
             </div>
           )}
@@ -127,7 +127,7 @@ export function EditorPage() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               aria-invalid={!!errors.title}
-              className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow aria-[invalid=true]:border-danger aria-[invalid=true]:ring-danger/20 text-lg"
+              className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow aria-[invalid=true]:border-danger aria-[invalid=true]:ring-danger/20 text-lg"
               placeholder="Give your post a title..."
             />
             {errors.title && <span className="block text-sm text-danger mt-1">{errors.title}</span>}
@@ -143,7 +143,7 @@ export function EditorPage() {
             <button
               type="submit"
               disabled={isSubmitting || isPublishing}
-              className="px-6 py-2.5 text-sm font-medium rounded-lg border border-border text-text-secondary bg-surface hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-6 py-2.5 text-sm font-medium rounded-lg border border-border text-text-secondary bg-surface hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isSubmitting ? 'Saving...' : 'Save Draft'}
             </button>
@@ -152,7 +152,8 @@ export function EditorPage() {
                 type="button"
                 onClick={handlePublish}
                 disabled={isSubmitting || isPublishing}
-                className="px-6 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-6 py-2.5 text-sm font-semibold text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-colors"
+                style={{ background: 'var(--color-primary)' }}
               >
                 {isPublishing ? 'Publishing...' : 'Publish'}
               </button>
@@ -162,7 +163,8 @@ export function EditorPage() {
                 type="button"
                 onClick={() => save(false).then(() => navigate('/dashboard'))}
                 disabled={isSubmitting || isPublishing}
-                className="px-6 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-6 py-2.5 text-sm font-semibold text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-colors"
+                style={{ background: 'var(--color-primary)' }}
               >
                 {isSubmitting ? 'Updating...' : 'Update Post'}
               </button>

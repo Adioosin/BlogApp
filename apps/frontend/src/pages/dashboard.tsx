@@ -58,7 +58,8 @@ export function DashboardPage() {
         <h1 className="text-3xl font-bold text-text-primary">My Posts</h1>
         <Link
           to="/editor"
-          className="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors no-underline"
+          className="inline-flex items-center px-4 py-2.5 text-sm font-semibold text-white rounded-lg no-underline hover:opacity-90 transition-colors"
+          style={{ background: 'var(--color-primary)' }}
         >
           New Post
         </Link>
@@ -66,19 +67,19 @@ export function DashboardPage() {
 
       {isLoading && (
         <div className="flex items-center justify-center py-16">
-          <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
           <span className="ml-3 text-text-secondary">Loading your posts...</span>
         </div>
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-danger rounded-lg px-4 py-3 mb-6" role="alert">
+        <div className="bg-danger/10 border border-danger/30 text-danger rounded-lg px-4 py-3 mb-6" role="alert">
           {error}
         </div>
       )}
 
       {actionError && (
-        <div className="bg-red-50 border border-red-200 text-danger rounded-lg px-4 py-3 mb-6" role="alert">
+        <div className="bg-danger/10 border border-danger/30 text-danger rounded-lg px-4 py-3 mb-6" role="alert">
           {actionError}
         </div>
       )}
@@ -89,7 +90,8 @@ export function DashboardPage() {
           <p className="text-lg text-text-secondary">You haven&apos;t written any posts yet.</p>
           <Link
             to="/editor"
-            className="inline-flex items-center mt-4 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors no-underline"
+            className="inline-flex items-center mt-4 px-4 py-2 text-sm font-semibold text-white rounded-lg no-underline hover:opacity-90 transition-colors"
+            style={{ background: 'var(--color-primary)' }}
           >
             Write your first post
           </Link>
@@ -106,14 +108,14 @@ export function DashboardPage() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-1">
                   <h2 className="text-lg font-semibold truncate">
-                    <Link to={`/posts/${post.id}`} className="text-text-primary hover:text-primary-600 no-underline">
+                    <Link to={`/posts/${post.id}`} className="text-text-primary hover:opacity-80 no-underline">
                       {post.title}
                     </Link>
                   </h2>
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                     post.isPublished
-                      ? 'bg-green-50 text-success border border-green-200'
-                      : 'bg-amber-50 text-warning border border-amber-200'
+                      ? 'bg-success/10 text-success border border-success/30'
+                      : 'bg-warning/10 text-warning border border-warning/30'
                   }`}>
                     {post.isPublished ? 'Published' : 'Draft'}
                   </span>
@@ -133,7 +135,8 @@ export function DashboardPage() {
                   <button
                     type="button"
                     onClick={() => handlePublish(post.id)}
-                    className="px-3 py-1.5 text-sm font-medium rounded-lg bg-primary-600 text-white hover:bg-primary-700 transition-colors"
+                    className="px-3 py-1.5 text-sm font-semibold text-white rounded-lg hover:opacity-90 transition-colors"
+                    style={{ background: 'var(--color-primary)' }}
                   >
                     Publish
                   </button>
@@ -141,7 +144,7 @@ export function DashboardPage() {
                 <button
                   type="button"
                   onClick={() => handleDelete(post.id)}
-                  className="px-3 py-1.5 text-sm font-medium rounded-lg text-danger border border-red-200 hover:bg-red-50 transition-colors"
+                  className="px-3 py-1.5 text-sm font-medium rounded-lg text-danger border border-danger/30 hover:bg-danger/10 transition-colors"
                 >
                   Delete
                 </button>
