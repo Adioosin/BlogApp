@@ -14,6 +14,7 @@ RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
 
 # ---------- dev ----------
 FROM deps AS dev
+COPY tsconfig.base.json ./
 COPY packages/types/ packages/types/
 COPY apps/backend/ apps/backend/
 COPY apps/backend/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
@@ -25,6 +26,7 @@ CMD ["pnpm", "dev"]
 
 # ---------- build ----------
 FROM deps AS build
+COPY tsconfig.base.json ./
 COPY packages/types/ packages/types/
 COPY apps/backend/ apps/backend/
 WORKDIR /app/apps/backend

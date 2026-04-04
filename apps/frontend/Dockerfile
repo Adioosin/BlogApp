@@ -14,6 +14,7 @@ RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
 
 # ---------- dev ----------
 FROM deps AS dev
+COPY tsconfig.base.json ./
 COPY packages/types/ packages/types/
 COPY apps/frontend/ apps/frontend/
 WORKDIR /app/apps/frontend
@@ -24,6 +25,7 @@ CMD ["pnpm", "dev", "--host"]
 FROM deps AS build
 ARG VITE_API_URL=http://localhost:3000/api/v1
 ENV VITE_API_URL=$VITE_API_URL
+COPY tsconfig.base.json ./
 COPY packages/types/ packages/types/
 COPY apps/frontend/ apps/frontend/
 WORKDIR /app/apps/frontend
