@@ -7,10 +7,16 @@ import type { CommentDto, PostDto } from '@blogapp/types';
 
 import { useAuth } from '../hooks/use-auth.js';
 import { commentsApi, postsApi } from '../lib/api-client.js';
+import { Avatar } from '../components/avatar.js';
 
 function renderMarkdown(md: string): string {
   const raw = marked.parse(md, { async: false }) as string;
   return DOMPurify.sanitize(raw);
+}
+
+function estimateReadTime(content: string): number {
+  const words = content.trim().split(/\s+/).length;
+  return Math.max(1, Math.ceil(words / 200));
 }
 
 export function PostDetailPage() {
@@ -28,11 +34,7 @@ export function PostDetailPage() {
     if (!id) return;
     setIsLoading(true);
     setError('');
-
-    Promise.all([
-      postsApi.get(id),
-      commentsApi.list(id),
-    ])
+    Promise.all([postsApi.get(id), commentsApi.list(id)])
       .then(([postRes, commentsRes]) => {
         setPost(postRes.data.data);
         setComments(commentsRes.data.data);
@@ -44,7 +46,6 @@ export function PostDetailPage() {
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id || !commentBody.trim()) return;
-
     setCommentError('');
     setIsSubmittingComment(true);
     try {
@@ -63,57 +64,102 @@ export function PostDetailPage() {
       await commentsApi.delete(commentId);
       setComments((prev) => prev.filter((c) => c.id !== commentId));
     } catch {
-      // Silently fail for now
+      // silent fail
     }
   };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
         <span className="ml-3 text-text-secondary">Loading...</span>
       </div>
     );
   }
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 text-danger rounded-lg px-4 py-3" role="alert">
+      <div className="bg-danger/10 border border-danger/30 text-danger rounded-xl px-4 py-3" role="alert">
         {error}
       </div>
     );
   }
   if (!post) return <p className="text-text-secondary">Post not found.</p>;
 
+  const readTime = estimateReadTime(post.content);
+
   return (
-    <div className="max-w-3xl mx-auto">
-      <article className="bg-surface rounded-xl border border-border shadow-card p-6 sm:p-8 mb-8">
-        <h1 className="text-3xl font-bold text-text-primary mb-3">{post.title}</h1>
-        <div className="flex items-center gap-2 text-sm text-text-muted mb-6">
-          <span>By {post.author.name}</span>
-          <span>&middot;</span>
-          <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+    <div className="max-w-[680px] mx-auto pt-4">
+      <article className="mb-12">
+        {/* Tag + read time */}
+        <div className="flex items-center gap-3 mb-4">
+          {(post as PostDto & { tags?: string[] }).tags?.[0] && (
+            <span
+              className="text-xs font-medium px-2.5 py-0.5 rounded-full"
+              style={{
+                background: 'var(--color-primary-subtle)',
+                color: 'var(--color-primary)',
+                border: '1px solid var(--color-primary-subtle-border)',
+              }}
+            >
+              {(post as PostDto & { tags?: string[] }).tags![0]}
+            </span>
+          )}
+          <span className="text-sm text-text-muted">{readTime} min read</span>
           {!post.isPublished && (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-warning border border-amber-200 ml-2">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-warning/10 text-warning border border-warning/30">
               Draft
             </span>
           )}
         </div>
+
+        {/* Title */}
+        <h1
+          className="text-4xl font-black text-text-primary mb-5 leading-tight"
+          style={{ letterSpacing: '-0.03em' }}
+        >
+          {post.title}
+        </h1>
+
+        {/* Author row */}
+        <div className="flex items-center gap-3 mb-6 pb-6 border-b border-border">
+          <Avatar name={post.author.name} size="md" />
+          <div>
+            <div className="text-sm font-semibold text-text-primary">{post.author.name}</div>
+            <div className="text-xs text-text-muted">
+              {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+            </div>
+          </div>
+        </div>
+
+        {/* Cover image */}
+        {(post as PostDto & { coverImage?: string }).coverImage && (
+          <img
+            src={(post as PostDto & { coverImage?: string }).coverImage}
+            alt={post.title}
+            className="w-full rounded-xl mb-8"
+            style={{ maxHeight: '400px', objectFit: 'cover' }}
+          />
+        )}
+
+        {/* Body */}
         <div
           className="prose max-w-none"
+          style={{ fontSize: '17px', lineHeight: '1.75' }}
           dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }}
         />
       </article>
 
+      {/* Comments */}
       {post.isPublished && (
-        <section className="bg-surface rounded-xl border border-border shadow-card p-6 sm:p-8">
-          <h2 className="text-xl font-semibold text-text-primary mb-6">
-            Comments ({comments.length})
+        <section className="border-t border-border pt-10">
+          <h2 className="text-xl font-bold text-text-primary mb-6">
+            {comments.length} {comments.length === 1 ? 'Comment' : 'Comments'}
           </h2>
 
           {isAuthenticated && (
             <form onSubmit={handleAddComment} className="mb-8">
               {commentError && (
-                <div className="bg-red-50 border border-red-200 text-danger rounded-lg px-4 py-3 text-sm mb-4" role="alert">
+                <div className="bg-danger/10 border border-danger/30 text-danger rounded-xl px-4 py-3 text-sm mb-4" role="alert">
                   {commentError}
                 </div>
               )}
@@ -123,13 +169,14 @@ export function PostDetailPage() {
                 placeholder="Write a comment..."
                 rows={3}
                 aria-label="Comment"
-                className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow resize-y"
+                className="w-full px-3 py-2 rounded-xl border border-border bg-surface text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow resize-y"
               />
               <div className="flex justify-end mt-3">
                 <button
                   type="submit"
                   disabled={isSubmittingComment || !commentBody.trim()}
-                  className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-4 py-2 text-sm font-semibold text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:opacity-90"
+                  style={{ background: 'var(--color-primary)' }}
                 >
                   {isSubmittingComment ? 'Posting...' : 'Post Comment'}
                 </button>
@@ -139,8 +186,8 @@ export function PostDetailPage() {
 
           {!isAuthenticated && (
             <p className="text-text-secondary mb-6">
-              <Link to="/login" className="font-medium text-primary-600 hover:text-primary-700">
-                Login
+              <Link to="/login" className="font-medium hover:opacity-80 no-underline" style={{ color: 'var(--color-primary)' }}>
+                Sign in
               </Link>{' '}
               to leave a comment.
             </p>
@@ -148,26 +195,28 @@ export function PostDetailPage() {
 
           <div className="space-y-4">
             {comments.map((comment) => (
-              <div key={comment.id} className="border border-border rounded-lg p-4 bg-surface-alt">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="font-semibold text-text-primary">{comment.author.name}</span>
-                    <span className="text-text-muted">&middot;</span>
-                    <span className="text-text-muted">
-                      {new Date(comment.createdAt).toLocaleDateString()}
-                    </span>
+              <div key={comment.id} className="flex gap-3">
+                <Avatar name={comment.author.name} size="sm" />
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="font-semibold text-text-primary">{comment.author.name}</span>
+                      <span className="text-text-muted text-xs">
+                        {new Date(comment.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    {user?.id === comment.authorId && (
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteComment(comment.id)}
+                        className="text-xs text-text-muted hover:text-danger transition-colors"
+                      >
+                        Delete
+                      </button>
+                    )}
                   </div>
-                  {user?.id === comment.authorId && (
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteComment(comment.id)}
-                      className="text-sm text-text-muted hover:text-danger transition-colors"
-                    >
-                      Delete
-                    </button>
-                  )}
+                  <p className="text-sm text-text-primary leading-relaxed">{comment.body}</p>
                 </div>
-                <p className="text-text-primary leading-relaxed">{comment.body}</p>
               </div>
             ))}
             {comments.length === 0 && (
