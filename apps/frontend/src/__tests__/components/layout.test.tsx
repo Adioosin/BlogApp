@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -6,10 +6,15 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { Layout } from '../../components/layout.js';
 
 const mockUseAuth = vi.fn();
+const mockToggleDark = vi.fn();
 
 vi.mock('../../hooks/use-auth.js', () => ({
   useAuth: () => mockUseAuth(),
   AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+vi.mock('../../hooks/use-dark-mode.js', () => ({
+  useDarkMode: () => ({ isDark: false, toggle: mockToggleDark }),
 }));
 
 describe('Layout', () => {
@@ -47,13 +52,13 @@ describe('Layout', () => {
       expect(screen.getByText('Home Content')).toBeDefined();
     });
 
-    it('shows login and register links', () => {
+    it('shows sign in and get started links', () => {
       renderLayout();
 
-      const loginLinks = screen.getAllByText(/login/i);
-      const registerLinks = screen.getAllByText(/register/i);
-      expect(loginLinks.length).toBeGreaterThan(0);
-      expect(registerLinks.length).toBeGreaterThan(0);
+      const signInLinks = screen.getAllByText(/sign in/i);
+      const getStartedLinks = screen.getAllByText(/get started/i);
+      expect(signInLinks.length).toBeGreaterThan(0);
+      expect(getStartedLinks.length).toBeGreaterThan(0);
     });
   });
 
@@ -69,13 +74,14 @@ describe('Layout', () => {
       });
     });
 
-    it('shows dashboard and new post links', () => {
+    it('shows new post link and user name', () => {
       renderLayout();
 
-      const dashboardLinks = screen.getAllByText(/dashboard/i);
       const newPostLinks = screen.getAllByText(/new post/i);
-      expect(dashboardLinks.length).toBeGreaterThan(0);
       expect(newPostLinks.length).toBeGreaterThan(0);
+
+      const userNames = screen.getAllByText('Test User');
+      expect(userNames.length).toBeGreaterThan(0);
     });
 
     it('shows user name', () => {
@@ -115,10 +121,9 @@ describe('Layout', () => {
       const toggleButton = screen.getByLabelText('Toggle menu');
       await user.click(toggleButton);
 
-      // Mobile menu should now show links (duplicated from desktop)
-      // Both desktop and mobile Home links exist, so we should have 2
+      // Mobile menu should now show the Home link (only in mobile menu, not desktop nav)
       const homeLinks = screen.getAllByText(/^home$/i);
-      expect(homeLinks.length).toBe(2);
+      expect(homeLinks.length).toBe(1);
     });
 
     it('closes mobile menu when hamburger is clicked again', async () => {
@@ -127,15 +132,13 @@ describe('Layout', () => {
 
       const toggleButton = screen.getByLabelText('Toggle menu');
 
-      // Open
+      // Open — mobile menu Home link appears
       await user.click(toggleButton);
-      let homeLinks = screen.getAllByText(/^home$/i);
-      expect(homeLinks.length).toBe(2);
+      expect(screen.getAllByText(/^home$/i).length).toBe(1);
 
-      // Close
+      // Close — mobile menu Home link disappears
       await user.click(toggleButton);
-      homeLinks = screen.getAllByText(/^home$/i);
-      expect(homeLinks.length).toBe(1);
+      expect(screen.queryAllByText(/^home$/i).length).toBe(0);
     });
 
     it('closes mobile menu when a nav link is clicked', async () => {
@@ -145,13 +148,12 @@ describe('Layout', () => {
       const toggleButton = screen.getByLabelText('Toggle menu');
       await user.click(toggleButton);
 
-      // Click the mobile Home link (the second one)
-      const homeLinks = screen.getAllByText(/^home$/i);
-      await user.click(homeLinks[1]);
+      // Click the mobile Home link
+      const homeLink = screen.getByText(/^home$/i);
+      await user.click(homeLink);
 
-      // Menu should close — only 1 Home link remains (desktop)
-      const remainingHomeLinks = screen.getAllByText(/^home$/i);
-      expect(remainingHomeLinks.length).toBe(1);
+      // Menu should close — Home link is gone (not in desktop nav)
+      expect(screen.queryAllByText(/^home$/i).length).toBe(0);
     });
 
     it('shows auth links in mobile menu when authenticated', async () => {
@@ -168,11 +170,11 @@ describe('Layout', () => {
       const toggleButton = screen.getByLabelText('Toggle menu');
       await user.click(toggleButton);
 
-      // Both desktop and mobile should show Dashboard
+      // Desktop dropdown is closed; only mobile menu shows Dashboard link
       const dashboardLinks = screen.getAllByText(/dashboard/i);
-      expect(dashboardLinks.length).toBe(2);
+      expect(dashboardLinks.length).toBeGreaterThan(0);
 
-      // Both should show New Post
+      // Desktop has "+ New Post" link, mobile menu has "New Post" — both match /new post/i
       const newPostLinks = screen.getAllByText(/new post/i);
       expect(newPostLinks.length).toBe(2);
     });
