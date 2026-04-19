@@ -35,7 +35,7 @@ services:
       JWT_ACCESS_EXPIRES_IN: 15m
       JWT_REFRESH_EXPIRES_IN: 7d
       PORT: 3000
-      FRONTEND_URL: http://localhost:5173
+      FRONTEND_URL: http://host.docker.internal:5173
     depends_on:
       db:
         condition: service_healthy
@@ -53,7 +53,7 @@ services:
       - ./apps/frontend/index.html:/app/apps/frontend/index.html
       - ./packages/types:/app/packages/types
     environment:
-      VITE_API_URL: http://localhost:3000/api/v1
+      VITE_API_URL: http://host.docker.internal:3000/api/v1
     depends_on:
       - backend
 

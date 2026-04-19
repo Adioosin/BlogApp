@@ -22,7 +22,7 @@ type UploadResult = {
   filename: string;
 };
 
-function saveImage(file: Express.Multer.File): UploadResult {
+function saveImage(file: Express.Multer.File, baseUrl: string): UploadResult {
   if (!ALLOWED_MIMETYPES.includes(file.mimetype)) {
     throw new Error('Invalid file type');
   }
@@ -34,7 +34,7 @@ function saveImage(file: Express.Multer.File): UploadResult {
 
   fs.writeFileSync(destPath, file.buffer);
 
-  const url = `/uploads/${filename}`;
+  const url = `${baseUrl}/uploads/${filename}`;
   return { url, filename };
 }
 

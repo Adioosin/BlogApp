@@ -19,7 +19,7 @@ const authenticate = (req: Request, res: Response, next: NextFunction) => {
 
   try {
     const payload = jwt.verify(token, secret) as TokenPayload;
-    req.user = { userId: payload.userId, email: payload.email };
+    req.user = { userId: payload.userId, email: payload.email, role: payload.role };
     next();
   } catch {
     res.status(401).json({
@@ -39,7 +39,7 @@ const optionalAuth = (req: Request, _res: Response, next: NextFunction) => {
 
   try {
     const payload = jwt.verify(token, secret) as TokenPayload;
-    req.user = { userId: payload.userId, email: payload.email };
+    req.user = { userId: payload.userId, email: payload.email, role: payload.role };
   } catch {
     // Ignore invalid tokens for optional auth
   }
@@ -47,4 +47,12 @@ const optionalAuth = (req: Request, _res: Response, next: NextFunction) => {
   next();
 };
 
-export { authenticate, optionalAuth };
+const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
+  if (req.user?.role !== 'ADMIN') {
+    res.status(403).json({ error: { message: 'Forbidden', code: 'FORBIDDEN' } });
+    return;
+  }
+  next();
+};
+
+export { authenticate, optionalAuth, requireAdmin };

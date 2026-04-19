@@ -57,7 +57,8 @@ uploadRouter.post('/upload/image', authenticate, (req, res) => {
     }
 
     try {
-      const result = saveImage(req.file);
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const result = saveImage(req.file, baseUrl);
       const validated = uploadResponseSchema.parse(result);
       res.status(201).json({ data: validated });
     } catch {
