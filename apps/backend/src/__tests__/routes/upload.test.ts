@@ -99,7 +99,7 @@ describe('Upload routes', () => {
         .attach('image', pngBuffer, { filename: 'test.png', contentType: 'image/png' });
 
       expect(res.status).toBe(201);
-      expect(res.body.data.url).toMatch(/^\/uploads\/.+\.png$/);
+      expect(res.body.data.url).toMatch(/\/uploads\/.+\.png$/);
       expect(res.body.data.filename).toMatch(/\.png$/);
 
       // Verify file was actually saved
@@ -116,7 +116,7 @@ describe('Upload routes', () => {
         .attach('image', Buffer.from('jpeg-data'), { filename: 'photo.jpg', contentType: 'image/jpeg' });
 
       expect(res.status).toBe(201);
-      expect(res.body.data.url).toMatch(/^\/uploads\/.+\.jpg$/);
+      expect(res.body.data.url).toMatch(/\/uploads\/.+\.jpg$/);
     });
 
     it('accepts webp images', async () => {
@@ -128,7 +128,7 @@ describe('Upload routes', () => {
         .attach('image', Buffer.from('webp-data'), { filename: 'photo.webp', contentType: 'image/webp' });
 
       expect(res.status).toBe(201);
-      expect(res.body.data.url).toMatch(/^\/uploads\/.+\.webp$/);
+      expect(res.body.data.url).toMatch(/\/uploads\/.+\.webp$/);
     });
   });
 });

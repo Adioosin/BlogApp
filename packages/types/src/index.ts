@@ -20,10 +20,13 @@ export type PaginatedResponse<T> = {
 
 // Auth types
 
+export type UserRole = 'USER' | 'ADMIN';
+
 export type UserDto = {
   id: string;
   email: string;
   name: string;
+  role: UserRole;
 };
 
 export type AuthTokens = {
@@ -54,6 +57,7 @@ export type RefreshRequest = {
 export type TokenPayload = {
   userId: string;
   email: string;
+  role: UserRole;
 };
 
 // Post types

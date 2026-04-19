@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-import type { AuthResponse, AuthTokens, LoginRequest, RegisterRequest, TokenPayload } from '@blogapp/types';
+import type { AuthResponse, AuthTokens, LoginRequest, RegisterRequest, TokenPayload, UserRole } from '@blogapp/types';
 
 import { prisma } from '../lib/prisma.js';
 import { env } from '../lib/env.js';
@@ -27,8 +27,8 @@ function generateTokens(payload: TokenPayload): AuthTokens {
   return { accessToken, refreshToken };
 }
 
-function toUserDto(user: { id: string; email: string; name: string }) {
-  return { id: user.id, email: user.email, name: user.name };
+function toUserDto(user: { id: string; email: string; name: string; role: UserRole }) {
+  return { id: user.id, email: user.email, name: user.name, role: user.role };
 }
 
 async function storeRefreshToken(token: string, userId: string): Promise<void> {
@@ -63,7 +63,7 @@ async function registerUser(data: RegisterRequest): Promise<AuthResponse> {
     },
   });
 
-  const tokens = generateTokens({ userId: user.id, email: user.email });
+  const tokens = generateTokens({ userId: user.id, email: user.email, role: user.role as UserRole });
   await storeRefreshToken(tokens.refreshToken, user.id);
 
   return { user: toUserDto(user), tokens };
@@ -86,7 +86,7 @@ async function loginUser(data: LoginRequest): Promise<AuthResponse> {
     throw error;
   }
 
-  const tokens = generateTokens({ userId: user.id, email: user.email });
+  const tokens = generateTokens({ userId: user.id, email: user.email, role: user.role as UserRole });
   await storeRefreshToken(tokens.refreshToken, user.id);
 
   return { user: toUserDto(user), tokens };
@@ -115,7 +115,7 @@ async function refreshTokens(refreshToken: string): Promise<AuthTokens> {
   // Rotate: delete old token
   await prisma.refreshToken.delete({ where: { id: stored.id } });
 
-  const tokens = generateTokens({ userId: payload.userId, email: payload.email });
+  const tokens = generateTokens({ userId: payload.userId, email: payload.email, role: payload.role });
   await storeRefreshToken(tokens.refreshToken, payload.userId);
 
   return tokens;
