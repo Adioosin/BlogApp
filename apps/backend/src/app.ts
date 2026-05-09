@@ -7,7 +7,7 @@ import { v1Router } from './routes/index.js';
 import { notFound } from './middleware/not-found.js';
 import { errorHandler } from './middleware/error-handler.js';
 
-const app = express();
+const app: express.Express = express();
 
 app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173' }));
 app.use(express.json());

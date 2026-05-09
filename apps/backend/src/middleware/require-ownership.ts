@@ -6,7 +6,7 @@ type ResourceFetcher = (id: string) => Promise<{ authorId: string } | null>;
 
 const requireOwnership = (fetchResource: ResourceFetcher, paramName = 'id') => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const resourceId = req.params[paramName];
+    const resourceId = req.params[paramName] as string;
     if (!resourceId) {
       const error = new Error('Resource ID is required') as AppError;
       error.statusCode = 400;

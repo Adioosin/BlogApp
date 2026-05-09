@@ -61,7 +61,7 @@ postsRouter.get('/posts/me', authenticate, validate(myPostsPaginationSchema, 'qu
 
 postsRouter.get('/posts/:id', optionalAuth, async (req, res, next) => {
   try {
-    const post = await postService.getPost(req.params.id, req.user?.userId);
+    const post = await postService.getPost(req.params.id as string, req.user?.userId);
     res.json({ data: post });
   } catch (err) {
     next(err);
@@ -84,7 +84,7 @@ postsRouter.patch(
   validate(updatePostSchema),
   async (req, res, next) => {
     try {
-      const post = await postService.updatePost(req.params.id, req.body);
+      const post = await postService.updatePost(req.params.id as string, req.body);
       res.json({ data: post });
     } catch (err) {
       next(err);
@@ -98,7 +98,7 @@ postsRouter.patch(
   requireOwnership(postService.findPostById),
   async (req, res, next) => {
     try {
-      const post = await postService.publishPost(req.params.id);
+      const post = await postService.publishPost(req.params.id as string);
       res.json({ data: post });
     } catch (err) {
       next(err);
@@ -112,7 +112,7 @@ postsRouter.delete(
   requireOwnership(postService.findPostById),
   async (req, res, next) => {
     try {
-      await postService.deletePost(req.params.id);
+      await postService.deletePost(req.params.id as string);
       res.status(204).send();
     } catch (err) {
       next(err);

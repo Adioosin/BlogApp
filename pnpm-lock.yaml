@@ -38,6 +38,9 @@ importers:
 
   apps/backend:
     dependencies:
+      '@blogapp/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       '@prisma/adapter-pg':
         specifier: ^7.6.0
         version: 7.6.0

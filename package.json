@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently -n frontend,backend -c blue,green \"pnpm --filter @blogapp/frontend dev\" \"pnpm --filter @blogapp/backend dev\"",
-    "build": "pnpm --filter @blogapp/backend build && pnpm --filter @blogapp/frontend build",
+    "build": "pnpm --filter @blogapp/types build && pnpm --filter @blogapp/backend build && pnpm --filter @blogapp/frontend build",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

@@ -29,7 +29,7 @@ commentsRouter.post(
   validate(createCommentSchema),
   async (req, res, next) => {
     try {
-      const comment = await commentService.createComment(req.params.id, req.body, req.user!.userId);
+      const comment = await commentService.createComment(req.params.id as string, req.body, req.user!.userId);
       res.status(201).json({ data: comment });
     } catch (err) {
       next(err);
@@ -43,7 +43,7 @@ commentsRouter.get(
   async (req, res, next) => {
     try {
       const { page, limit } = req.query as unknown as { page: number; limit: number };
-      const result = await commentService.listComments(req.params.id, page, limit);
+      const result = await commentService.listComments(req.params.id as string, page, limit);
       res.json(result);
     } catch (err) {
       next(err);
@@ -57,7 +57,7 @@ commentsRouter.delete(
   requireOwnership(commentService.findCommentById),
   async (req, res, next) => {
     try {
-      await commentService.deleteComment(req.params.id);
+      await commentService.deleteComment(req.params.id as string);
       res.status(204).send();
     } catch (err) {
       next(err);

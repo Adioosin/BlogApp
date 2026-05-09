@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, type Router as RouterType } from 'express';
 import multer from 'multer';
 import { z } from 'zod';
 
@@ -25,7 +25,7 @@ const upload = multer({
   },
 });
 
-const uploadRouter = Router();
+const uploadRouter: RouterType = Router();
 
 uploadRouter.post('/upload/image', authenticate, (req, res) => {
   upload.single('image')(req, res, (err) => {

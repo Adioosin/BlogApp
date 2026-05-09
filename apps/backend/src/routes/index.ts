@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, type Router as RouterType } from 'express';
 
 import { authRouter } from './auth.js';
 import { commentsRouter } from './comments.js';
@@ -6,7 +6,7 @@ import { healthRouter } from './health.js';
 import { postsRouter } from './posts.js';
 import { uploadRouter } from './upload.js';
 
-const v1Router = Router();
+const v1Router: RouterType = Router();
 
 v1Router.use(healthRouter);
 v1Router.use(authRouter);
