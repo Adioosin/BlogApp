@@ -36,3 +36,6 @@ apps/backend/prisma/*.db-journal
 *.log
 npm-debug.log*
 pnpm-debug.log*
+
+# Playwright MCP
+.playwright-mcp/

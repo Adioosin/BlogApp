@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "MCP_DOCKER": {
+      "command": "docker",
+      "args": ["mcp", "gateway", "run"],
+      "type": "stdio"
+    },
+    "blogapp": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["apps/mcp-server/dist/index.js"],
+      "env": {
+        "BLOG_API_BASE_URL": "http://localhost:3000/api/v1",
+        "BLOG_API_EMAIL": "alice@blogapp.com",
+        "BLOG_API_PASSWORD": "password123"
+      }
+    }
+  }
+}
